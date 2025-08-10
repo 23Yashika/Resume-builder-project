@@ -1,13 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
+import { Menu, X } from "lucide-react";
 
 const HomePage = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <div className="bg-gray-50 text-gray-800 font-sans">
       {/* Navbar */}
       <nav className="bg-white shadow-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-blue-600">ResumeBuilder</h1>
-          <ul className="flex gap-6">
+
+          {/* Desktop Menu */}
+          <ul className="hidden md:flex gap-6">
             <li>
               <a href="#home" className="hover:text-blue-600 transition">
                 Home
@@ -24,7 +29,48 @@ const HomePage = () => {
               </a>
             </li>
           </ul>
+
+          {/* Hamburger Icon */}
+          <button
+            className="md:hidden text-gray-700"
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            {isOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
         </div>
+
+        {/* Mobile Menu */}
+        {isOpen && (
+          <ul className="md:hidden flex flex-col items-center bg-white shadow-md py-4 space-y-4">
+            <li>
+              <a
+                href="#home"
+                className="hover:text-blue-600 transition"
+                onClick={() => setIsOpen(false)}
+              >
+                Home
+              </a>
+            </li>
+            <li>
+              <a
+                href="#about"
+                className="hover:text-blue-600 transition"
+                onClick={() => setIsOpen(false)}
+              >
+                About
+              </a>
+            </li>
+            <li>
+              <a
+                href="#features"
+                className="hover:text-blue-600 transition"
+                onClick={() => setIsOpen(false)}
+              >
+                Features
+              </a>
+            </li>
+          </ul>
+        )}
       </nav>
 
       {/* Hero Section */}
@@ -62,9 +108,8 @@ const HomePage = () => {
         </h3>
         <p className="text-gray-700 text-lg leading-relaxed text-center max-w-3xl mx-auto">
           Our Resume Builder is designed to help job seekers create professional
-          resumes effortlessly. Whether you're starting from scratch or
-          refining an existing resume, our tools guide you every step of the
-          way.
+          resumes effortlessly. Whether you're starting from scratch or refining
+          an existing resume, our tools guide you every step of the way.
         </p>
       </section>
 
@@ -74,6 +119,6 @@ const HomePage = () => {
       </footer>
     </div>
   );
-}
+};
 
 export default HomePage;
