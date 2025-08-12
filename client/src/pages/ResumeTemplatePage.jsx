@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { FileText, User, Mail, Phone, GraduationCap, Code, Briefcase, Download, Check } from "lucide-react";
-
+import { useNavigate } from "react-router-dom";
 const ResumeTemplatePage = () => {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -70,7 +71,9 @@ const ResumeTemplatePage = () => {
     }
     console.log("Generating resume with:", formData, "Template:", selectedTemplate);
     // Logic to preview or generate PDF would go here
-    alert("Resume generated successfully! (Preview functionality would be implemented here)");
+    alert("Resume generated successfully!");
+
+    navigate('/resume-preview');
   };
 
   const getSelectedTemplate = () => {

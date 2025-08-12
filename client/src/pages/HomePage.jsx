@@ -1,78 +1,13 @@
 import React, { useState } from "react";
 import { Menu, X } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const HomePage = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <div className="bg-gray-50 text-gray-800 font-sans">
-      {/* Navbar */}
-      <nav className="bg-white shadow-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-blue-600">ResumeBuilder</h1>
-
-          {/* Desktop Menu */}
-          <ul className="hidden md:flex gap-6">
-            <li>
-              <a href="#home" className="hover:text-blue-600 transition">
-                Home
-              </a>
-            </li>
-            <li>
-              <a href="#about" className="hover:text-blue-600 transition">
-                About
-              </a>
-            </li>
-            <li>
-              <a href="#features" className="hover:text-blue-600 transition">
-                Features
-              </a>
-            </li>
-          </ul>
-
-          {/* Hamburger Icon */}
-          <button
-            className="md:hidden text-gray-700"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            {isOpen ? <X size={28} /> : <Menu size={28} />}
-          </button>
-        </div>
-
-        {/* Mobile Menu */}
-        {isOpen && (
-          <ul className="md:hidden flex flex-col items-center bg-white shadow-md py-4 space-y-4">
-            <li>
-              <a
-                href="#home"
-                className="hover:text-blue-600 transition"
-                onClick={() => setIsOpen(false)}
-              >
-                Home
-              </a>
-            </li>
-            <li>
-              <a
-                href="#about"
-                className="hover:text-blue-600 transition"
-                onClick={() => setIsOpen(false)}
-              >
-                About
-              </a>
-            </li>
-            <li>
-              <a
-                href="#features"
-                className="hover:text-blue-600 transition"
-                onClick={() => setIsOpen(false)}
-              >
-                Features
-              </a>
-            </li>
-          </ul>
-        )}
-      </nav>
-
+  
       {/* Hero Section */}
       <section
         id="home"
@@ -86,12 +21,12 @@ const HomePage = () => {
           Fast, easy, and professional.
         </p>
         <div className="flex justify-center gap-4">
-          <a
-            href="#create"
+          <Link
+            to='/resume-template'
             className="px-6 py-3 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
           >
             Create Resume
-          </a>
+          </Link>
           <a
             href="#optimise"
             className="px-6 py-3 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition"
