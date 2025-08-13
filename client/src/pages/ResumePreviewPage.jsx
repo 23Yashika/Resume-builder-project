@@ -1,24 +1,26 @@
-import React, { useState } from "react";
 
+
+
+
+
+
+
+
+
+
+
+import React, { useState, useRef } from "react";
 import { 
-  Download, 
-  Eye, 
-  Phone, 
-  Mail, 
-  MapPin,
-  Edit,
-  Star,
-  FileText,
-  Award,
-  ZoomIn,
-  ZoomOut,
-  RotateCcw
+  Download, Eye, Edit, FileText, Award, ZoomIn, ZoomOut, RotateCcw
 } from "lucide-react";
 import MobileATSScore from "../components/MobileATSScore";
 import Resume from "../components/Resume";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 const ResumePreviewPage = () => {
   const [zoomLevel, setZoomLevel] = useState(100);
+  const resumeRef = useRef(null);
 
   const handleZoomIn = () => {
     if (zoomLevel < 150) setZoomLevel(prev => prev + 10);
@@ -33,7 +35,16 @@ const ResumePreviewPage = () => {
   };
 
   const handleDownloadResume = () => {
-    alert("Resume downloaded successfully! (PDF generation would be implemented here)");
+    if (!resumeRef.current) return;
+
+    html2canvas(resumeRef.current, { scale: 2 }).then((canvas) => {
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.save("resume.pdf");
+    });
   };
 
   const handleEditResume = () => {
@@ -54,31 +65,20 @@ const ResumePreviewPage = () => {
               </div>
             </div>
 
-            {/* Controls - Stack on mobile */}
+            {/* Controls */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               {/* Zoom Controls */}
               <div className="flex items-center justify-center gap-2 bg-gray-50 rounded-lg p-1">
-                <button 
-                  onClick={handleZoomOut}
-                  className="p-2 hover:bg-gray-200 rounded transition-colors"
-                  disabled={zoomLevel <= 50}
-                >
+                <button onClick={handleZoomOut} disabled={zoomLevel <= 50} className="p-2 hover:bg-gray-200 rounded transition-colors">
                   <ZoomOut className="w-4 h-4" />
                 </button>
                 <span className="px-3 py-1 text-sm font-medium min-w-[60px] text-center">
                   {zoomLevel}%
                 </span>
-                <button 
-                  onClick={handleZoomIn}
-                  className="p-2 hover:bg-gray-200 rounded transition-colors"
-                  disabled={zoomLevel >= 150}
-                >
+                <button onClick={handleZoomIn} disabled={zoomLevel >= 150} className="p-2 hover:bg-gray-200 rounded transition-colors">
                   <ZoomIn className="w-4 h-4" />
                 </button>
-                <button 
-                  onClick={handleResetZoom}
-                  className="p-2 hover:bg-gray-200 rounded transition-colors ml-1"
-                >
+                <button onClick={handleResetZoom} className="p-2 hover:bg-gray-200 rounded transition-colors ml-1">
                   <RotateCcw className="w-4 h-4" />
                 </button>
               </div>
@@ -106,35 +106,31 @@ const ResumePreviewPage = () => {
         </div>
       </div>
 
+      {/* Content */}
       <div className="max-w-7xl mx-auto px-4 py-4 sm:py-8">
-        {/* Mobile Layout - Stack vertically */}
+        {/* Mobile */}
         <div className="block xl:hidden space-y-6">
-         <MobileATSScore />
-          {/* Mobile Resume Preview */}
+          <MobileATSScore />
           <div className="bg-white rounded-xl shadow-lg p-4 overflow-hidden">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                <Eye className="w-5 h-5 text-blue-600" />
-                Resume Preview
+                <Eye className="w-5 h-5 text-blue-600" /> Resume Preview
               </h2>
               <div className="flex items-center gap-2 text-blue-600 text-xs">
-                <Award className="w-4 h-4" />
-                <span>ATS Optimized</span>
+                <Award className="w-4 h-4" /> <span>ATS Optimized</span>
               </div>
             </div>
-            
+
             <div className="overflow-x-auto">
-              <div className="min-w-[600px] mx-auto" style={{ 
+              <div className="min-w-[600px] mx-auto" style={{
                 transform: `scale(${Math.min(zoomLevel / 100, 0.8)})`,
-                transformOrigin: 'top center',
-                transition: 'transform 0.2s ease'
+                transformOrigin: "top center",
+                transition: "transform 0.2s ease"
               }}>
-                <div className="w-[794px] h-[1123px] bg-gradient-to-br from-pink-100 to-pink-200 relative mx-auto shadow-xl rounded-lg overflow-hidden">
-                  {/* ATS Score Badge */}
+                <div ref={resumeRef} className="w-[794px] h-[1123px] bg-gradient-to-br from-pink-100 to-pink-200 relative mx-auto shadow-xl rounded-lg overflow-hidden">
                   <div className="absolute top-6 right-6 bg-blue-200 text-blue-800 px-4 py-2 rounded-lg font-bold text-sm border-2 border-blue-300">
                     ATS SCORE
                   </div>
-
                   <Resume />
                 </div>
               </div>
@@ -142,27 +138,20 @@ const ResumePreviewPage = () => {
           </div>
         </div>
 
-        {/* Desktop Layout - Side by side */}
+        {/* Desktop */}
         <div className="hidden xl:grid xl:grid-cols-4 gap-8">
-          {/* ATS Score Section */}
-         <MobileATSScore />
-
-          {/* Resume Preview Section */}
+          <MobileATSScore />
           <div className="xl:col-span-3 flex justify-center">
-            <div className="bg-white shadow-2xl rounded-lg overflow-hidden" style={{ 
+            <div className="bg-white shadow-2xl rounded-lg overflow-hidden" style={{
               transform: `scale(${zoomLevel / 100})`,
-              transformOrigin: 'top center',
-              transition: 'transform 0.2s ease'
+              transformOrigin: "top center",
+              transition: "transform 0.2s ease"
             }}>
-              {/* Resume Template */}
-              <div className="w-[794px] h-[1123px] bg-gradient-to-br from-pink-100 to-pink-200 relative">
-                {/* ATS Score Badge */}
+              <div ref={resumeRef} className="w-[794px] h-[1123px] bg-gradient-to-br from-pink-100 to-pink-200 relative">
                 <div className="absolute top-6 right-6 bg-blue-200 text-blue-800 px-4 py-2 rounded-lg font-bold text-sm border-2 border-blue-300">
                   ATS SCORE
                 </div>
-
-                {/* Content Container */}
-               <Resume />
+                <Resume />
               </div>
             </div>
           </div>
@@ -173,3 +162,4 @@ const ResumePreviewPage = () => {
 };
 
 export default ResumePreviewPage;
+

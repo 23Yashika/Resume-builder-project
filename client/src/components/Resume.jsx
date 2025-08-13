@@ -1,183 +1,154 @@
-import React, { useState } from "react";
-import { Phone, Mail, MapPin } from "lucide-react"; // or your preferred icon library
+import React from "react";
+
+// Sample JSON Data for Resume
+const resumeData = {
+  name: "John Doe",
+  title: "Full Stack Developer",
+  contact: {
+    email: "johndoe@example.com",
+    phone: "+1 234 567 890",
+    location: "New York, USA",
+    website: "www.johndoe.com",
+    linkedin: "linkedin.com/in/johndoe",
+  },
+  summary:
+    "Experienced Full Stack Developer with 5+ years of expertise in building scalable web applications. Proficient in MERN stack, REST APIs, and cloud deployment.",
+  skills: [
+    "JavaScript (ES6+)",
+    "React.js",
+    "Node.js",
+    "MongoDB",
+    "Express.js",
+    "Tailwind CSS",
+    "REST APIs",
+    "Git & GitHub",
+  ],
+  experience: [
+    {
+      role: "Senior Full Stack Developer",
+      company: "Tech Solutions Inc.",
+      duration: "Jan 2021 - Present",
+      description: [
+        "Developed and maintained full-stack web applications using MERN stack.",
+        "Implemented authentication, authorization, and role-based access control.",
+        "Optimized backend queries, reducing API response time by 40%.",
+      ],
+    },
+    {
+      role: "Frontend Developer",
+      company: "Creative Web Agency",
+      duration: "Jun 2018 - Dec 2020",
+      description: [
+        "Built responsive UI components using React.js and Tailwind CSS.",
+        "Collaborated with designers to create pixel-perfect layouts.",
+        "Integrated third-party APIs for dynamic content rendering.",
+      ],
+    },
+  ],
+  education: [
+    {
+      degree: "B.Tech in Computer Science",
+      institution: "ABC University",
+      duration: "2014 - 2018",
+      details: "Graduated with honors, CGPA: 8.5/10",
+    },
+  ],
+  awards: [
+    "Best Developer Award - Tech Solutions Inc. (2022)",
+    "Employee of the Month - Creative Web Agency (2020)",
+  ],
+};
 
 const Resume = () => {
-  const [resumeData, setResumeData] = useState({
-    name: "STEVE WILSON",
-    title: "ADMINISTRATION MANAGER",
-    phone: "+123-456-7890",
-    email: "hello@reallygreatsite.com",
-    address: "123 Anywhere St., Any City",
-    summary:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi facilisis felis a odio auctor, ut fermentum lorem fermentum. Nunc sodales sapien urna ac cursus. Etiam vel pretium odio. Donec id magna sollicitudin, facilisis augue blandit, rutrum erat. Proin non eros justo. Proin id metus sed erat efficitur lacinia. Aliquam erat.",
-    education: [
-      {
-        period: "2009 - 2014",
-        institution: "Fauget University",
-        degree: "Bachelor in Business Administration",
-      },
-      {
-        period: "2004 - 2008",
-        institution: "Fauget High School",
-        degree: "Graduation with Honor",
-      },
-    ],
-    skills: [
-      "Project Management Tools",
-      "Advanced Administration Software",
-      "Corporate Sales Account Management",
-      "Social Media Management",
-      "Spanish Language Proficiency",
-    ],
-    experience: [
-      {
-        position: "Assistant Manager",
-        company: "Fauget Company",
-        period: "2019 - Now",
-        description:
-          "Comprehensive administrative assistance to Management. Agenda follow-up. Review of documents suitability and file control. Creation of monthly presentations.",
-      },
-      {
-        position: "Administrative Assistant",
-        company: "Fauget Company",
-        period: "2016 - 2017",
-        description:
-          "Customer Reception. Dashboard management. Attendance at the front desk. Check-in and check-out book organization. File maintenance. Preparation of weekly reports.",
-      },
-      {
-        position: "Administrative Intern",
-        company: "Fauget Company",
-        period: "2016 - 2017",
-        description:
-          "Customer Reception. Dashboard management. Attendance at the front desk. Check-in and check-out book organization. File maintenance. Preparation of weekly reports.",
-      },
-    ],
-  });
-
-  // Missing function added
-  const handleDownloadResume = () => {
-    // You can implement PDF download here
-    alert("Download Resume clicked!");
-  };
-
   return (
-    <>
-      <div className="p-12">
-        {/* Header Section */}
-        <div className="bg-white rounded-2xl p-8 mb-8 shadow-lg border-2 border-gray-200">
-          <div className="mb-6">
-            <h1 className="text-4xl font-black text-gray-800 mb-2">
-              {resumeData.name}
-            </h1>
-            <p className="text-gray-600 font-semibold uppercase tracking-wider">
-              {resumeData.title}
-            </p>
-          </div>
-
-          <div className="flex flex-wrap gap-6 text-sm text-gray-700 mb-6">
-            <div className="flex items-center gap-2">
-              <Phone className="w-4 h-4" />
-              <span>{resumeData.phone}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Mail className="w-4 h-4" />
-              <span>{resumeData.email}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4" />
-              <span>{resumeData.address}</span>
-            </div>
-          </div>
-
-          <div className="bg-gray-50 rounded-xl p-6 text-sm text-gray-700 leading-relaxed">
-            {resumeData.summary}
-          </div>
+    <div className="max-w-4xl mx-auto bg-white text-black p-8 border border-gray-300">
+      {/* Header */}
+      <header className="border-b border-gray-400 pb-4 mb-6">
+        <h1 className="text-3xl font-bold">{resumeData.name}</h1>
+        <p className="text-lg">{resumeData.title}</p>
+        <div className="text-sm mt-2">
+          <p>{resumeData.contact.email} | {resumeData.contact.phone}</p>
+          <p>{resumeData.contact.location}</p>
+          <p>{resumeData.contact.website} | {resumeData.contact.linkedin}</p>
         </div>
+      </header>
 
-        {/* Two Column Layout */}
-        <div className="grid grid-cols-2 gap-8">
-          {/* Left Column */}
-          <div className="space-y-8">
-            {/* Education Section */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg border-2 border-gray-200">
-              <h2 className="text-2xl font-black text-gray-800 mb-6">
-                EDUCATION
-              </h2>
-              <div className="space-y-6">
-                {resumeData.education.map((edu, index) => (
-                  <div key={index}>
-                    <div className="text-gray-600 font-semibold text-sm mb-1">
-                      {edu.period}
-                    </div>
-                    <div className="font-bold text-gray-800 text-lg">
-                      {edu.institution}
-                    </div>
-                    <div className="text-gray-600 text-sm">{edu.degree}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
+      {/* Summary */}
+      <section className="mb-6">
+        <h2 className="text-xl font-semibold border-b border-gray-400 mb-2">
+          Professional Summary
+        </h2>
+        <p className="text-sm leading-relaxed">{resumeData.summary}</p>
+      </section>
 
-            {/* Skills Section */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg border-2 border-gray-200">
-              <h2 className="text-2xl font-black text-gray-800 mb-6">SKILLS</h2>
-              <ul className="space-y-3">
-                {resumeData.skills.map((skill, index) => (
-                  <li
-                    key={index}
-                    className="flex items-center gap-3 text-sm text-gray-700"
-                  >
-                    <div className="w-2 h-2 bg-gray-400 rounded-full flex-shrink-0"></div>
-                    <span>{skill}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+      {/* Skills */}
+      <section className="mb-6">
+        <h2 className="text-xl font-semibold border-b border-gray-400 mb-2">
+          Skills
+        </h2>
+        <ul className="grid grid-cols-2 gap-1 text-sm">
+          {resumeData.skills.map((skill, index) => (
+            <li key={index}>• {skill}</li>
+          ))}
+        </ul>
+      </section>
+
+      {/* Experience */}
+      <section className="mb-6">
+        <h2 className="text-xl font-semibold border-b border-gray-400 mb-2">
+          Experience
+        </h2>
+        {resumeData.experience.map((exp, index) => (
+          <div key={index} className="mb-4">
+            <p className="font-bold">{exp.role} - {exp.company}</p>
+            <p className="text-sm text-gray-600">{exp.duration}</p>
+            <ul className="list-disc list-inside text-sm mt-1">
+              {exp.description.map((item, idx) => (
+                <li key={idx}>{item}</li>
+              ))}
+            </ul>
           </div>
+        ))}
+      </section>
 
-          {/* Right Column */}
-          <div>
-            {/* Work Experience Section */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg border-2 border-gray-200">
-              <h2 className="text-2xl font-black text-gray-800 mb-6">
-                WORK EXPERIENCE
-              </h2>
-              <div className="space-y-8">
-                {resumeData.experience.map((job, index) => (
-                  <div key={index} className="relative">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-4 h-4 bg-blue-600 rounded-full flex-shrink-0"></div>
-                      <div>
-                        <h3 className="font-bold text-gray-800 text-lg">
-                          {job.position}
-                        </h3>
-                        <div className="text-gray-600 font-medium">
-                          {job.company}, {job.period}
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-sm text-gray-700 ml-7 leading-relaxed">
-                      {job.description}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
+      {/* Education */}
+      <section className="mb-6">
+        <h2 className="text-xl font-semibold border-b border-gray-400 mb-2">
+          Education
+        </h2>
+        {resumeData.education.map((edu, index) => (
+          <div key={index}>
+            <p className="font-bold">{edu.degree} - {edu.institution}</p>
+            <p className="text-sm text-gray-600">{edu.duration}</p>
+            <p className="text-sm">{edu.details}</p>
           </div>
-        </div>
+        ))}
+      </section>
 
-        {/* Download Button */}
-        <div className="mt-12 text-center">
-          <button
-            onClick={handleDownloadResume}
-            className="inline-flex items-center gap-3 bg-yellow-300 hover:bg-yellow-400 text-gray-800 px-12 py-4 rounded-2xl border-3 border-gray-800 font-black text-xl shadow-lg transition-all duration-200 transform hover:scale-105"
-          >
-            DOWNLOAD RESUME
-          </button>
-        </div>
-      </div>
-    </>
+      {/* Awards */}
+      <section>
+        <h2 className="text-xl font-semibold border-b border-gray-400 mb-2">
+          Awards & Achievements
+        </h2>
+        <ul className="list-disc list-inside text-sm">
+          {resumeData.awards.map((award, index) => (
+            <li key={index}>{award}</li>
+          ))}
+        </ul>
+      </section>
+    </div>
   );
 };
 
 export default Resume;
+
+
+
+
+
+
+
+
+
+
+
