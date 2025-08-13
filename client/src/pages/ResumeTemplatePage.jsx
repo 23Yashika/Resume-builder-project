@@ -1,63 +1,84 @@
 import React, { useState } from "react";
-import { FileText, User, Mail, Phone, GraduationCap, Code, Briefcase, Download, Check } from "lucide-react";
+import {
+  FileText,
+  User,
+  Mail,
+  Phone,
+  GraduationCap,
+  Code,
+  Briefcase,
+  Download,
+  Check,
+  MapPin,
+  Globe,
+  Type,
+  Book,
+  Plus,
+  Trash,
+  Award,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
+
 const ResumeTemplatePage = () => {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     name: "",
+    jobTitle: "",
     email: "",
     phone: "",
-    education: "",
-    skills: "",
-    experience: ""
+    location: "",
+    website: "",
+    summary: "",
+    education: [],
+    experience: [],
+    skills: [],
+    achievements: [],
   });
 
+  // Templates
   const templates = [
-    { 
-      id: 1, 
-      name: "Professional", 
-      color: "from-blue-500 to-blue-600",
-      preview: "Modern clean design with blue accents"
-    },
-    { 
-      id: 2, 
-      name: "Creative", 
-      color: "from-purple-500 to-pink-500",
-      preview: "Bold gradient design for creative roles"
-    },
-    { 
-      id: 3, 
-      name: "Executive", 
-      color: "from-gray-700 to-gray-900",
-      preview: "Elegant dark theme for senior positions"
-    }
+    { id: 1, name: "Professional", color: "from-blue-500 to-blue-600", preview: "Modern clean design with blue accents" },
+    { id: 2, name: "Creative", color: "from-purple-500 to-pink-500", preview: "Bold gradient design for creative roles" },
+    { id: 3, name: "Executive", color: "from-gray-700 to-gray-900", preview: "Elegant dark theme for senior positions" },
   ];
 
-  const formFields = [
-    { name: "name", placeholder: "Full Name", type: "text", icon: User, required: true },
-    { name: "email", placeholder: "Email Address", type: "email", icon: Mail, required: true },
-    { name: "phone", placeholder: "Phone Number", type: "tel", icon: Phone, required: true },
-    { name: "education", placeholder: "Education Details (Degree, University, Year)", type: "textarea", icon: GraduationCap, required: true },
-    { name: "skills", placeholder: "Skills (comma-separated)", type: "textarea", icon: Code, required: true },
-    { name: "experience", placeholder: "Work Experience (Company, Position, Duration, Achievements)", type: "textarea", icon: Briefcase, required: true }
-  ];
-
-  const handleTemplateSelect = (templateId) => {
-    setSelectedTemplate(templateId);
-  };
-
-  const handleChange = (e) => {
+  // Personal info handler
+  const handlePersonalChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Array section handler
+  const handleArrayChange = (section, index, field, value) => {
+    const updated = [...formData[section]];
+    updated[index][field] = value;
+    setFormData({ ...formData, [section]: updated });
+  };
+
+  // Add new entry to array section
+  const addArrayItem = (section, emptyObj) => {
+    setFormData({ ...formData, [section]: [...formData[section], emptyObj] });
+  };
+
+  // Remove entry from array section
+  const removeArrayItem = (section, index) => {
+    const updated = formData[section].filter((_, i) => i !== index);
+    setFormData({ ...formData, [section]: updated });
+  };
+
   const isFormValid = () => {
-    return formFields.every(field => {
-      if (field.required) {
-        return formData[field.name]?.trim() !== "";
-      }
-      return true;
-    });
+    return (
+      formData.name.trim() &&
+      formData.jobTitle.trim() &&
+      formData.email.trim() &&
+      formData.phone.trim() &&
+      formData.location.trim() &&
+      formData.summary.trim() &&
+      formData.education.length > 0 &&
+      formData.experience.length > 0 &&
+      formData.skills.length > 0
+    );
   };
 
   const handleGenerateResume = () => {
@@ -69,25 +90,20 @@ const ResumeTemplatePage = () => {
       alert("Please fill in all required fields!");
       return;
     }
-    console.log("Generating resume with:", formData, "Template:", selectedTemplate);
-    // Logic to preview or generate PDF would go here
-    alert("Resume generated successfully!");
-
-    navigate('/resume-preview');
+    console.log("Form data to send:", formData);
+    navigate("/resume-preview", { state: { formData, selectedTemplate } });
   };
 
-  const getSelectedTemplate = () => {
-    return templates.find(t => t.id === selectedTemplate);
-  };
+  const getSelectedTemplate = () => templates.find((t) => t.id === selectedTemplate);
 
   return (
-    <div className="min-h-screen  bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
       <div className="bg-white flex items-center justify-center shadow-sm border-b">
         <div className="max-w-6xl mx-auto px-4 py-6">
-          <div className=" flex gap-3">
+          <div className="flex gap-3">
             <FileText className="w-8 h-8 text-blue-600" />
-            <h1 className="text-3xl  font-bold text-gray-900">Resume Builder</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Resume Builder</h1>
           </div>
           <p className="text-gray-600 mt-2">Create a professional resume in minutes</p>
         </div>
@@ -98,45 +114,39 @@ const ResumeTemplatePage = () => {
           {/* Left Column - Template Selection */}
           <div className="space-y-6">
             <div className="bg-white rounded-xl shadow-lg p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+              <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
                 <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold">1</span>
                 Choose Your Template
               </h2>
-              
-              <div className="grid gap-4">
-                {templates.map((template) => (
-                  <div
-                    key={template.id}
-                    onClick={() => handleTemplateSelect(template.id)}
-                    className={`relative group cursor-pointer rounded-lg border-2 transition-all duration-200 ${
-                      selectedTemplate === template.id
-                        ? "border-blue-500 ring-4 ring-blue-100"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                  >
-                    <div className="flex items-center p-4">
-                      <div className={`w-16 h-20 rounded-lg bg-gradient-to-br ${template.color} shadow-md flex items-center justify-center`}>
-                        <FileText className="w-8 h-8 text-white" />
-                      </div>
-                      <div className="ml-4 flex-1">
-                        <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-                          {template.name}
-                          {selectedTemplate === template.id && (
-                            <Check className="w-4 h-4 text-blue-500" />
-                          )}
-                        </h3>
-                        <p className="text-sm text-gray-600 mt-1">{template.preview}</p>
-                      </div>
+
+              {templates.map((template) => (
+                <div
+                  key={template.id}
+                  onClick={() => setSelectedTemplate(template.id)}
+                  className={`relative group cursor-pointer rounded-lg border-2 transition-all duration-200 ${
+                    selectedTemplate === template.id
+                      ? "border-blue-500 ring-4 ring-blue-100"
+                      : "border-gray-200 hover:border-gray-300"
+                  } mb-4`}
+                >
+                  <div className="flex items-center p-4">
+                    <div className={`w-16 h-20 rounded-lg bg-gradient-to-br ${template.color} flex items-center justify-center`}>
+                      <FileText className="w-8 h-8 text-white" />
+                    </div>
+                    <div className="ml-4 flex-1">
+                      <h3 className="font-semibold flex items-center gap-2">
+                        {template.name}
+                        {selectedTemplate === template.id && <Check className="w-4 h-4 text-blue-500" />}
+                      </h3>
+                      <p className="text-sm text-gray-600 mt-1">{template.preview}</p>
                     </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
 
               {selectedTemplate && (
                 <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-blue-800 text-sm font-medium">
-                    ✓ {getSelectedTemplate()?.name} template selected
-                  </p>
+                  ✓ {getSelectedTemplate()?.name} template selected
                 </div>
               )}
             </div>
@@ -144,68 +154,97 @@ const ResumeTemplatePage = () => {
 
           {/* Right Column - Form */}
           <div className="space-y-6">
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            {/* Personal Info */}
+            <div className="bg-white rounded-xl shadow-lg p-6 space-y-4">
+              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
                 <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold">2</span>
-                Enter Your Details
+                Personal Information
               </h2>
-
-              <div className="space-y-4">
-                {formFields.map((field) => {
-                  const Icon = field.icon;
-                  return (
-                    <div key={field.name} className="relative">
-                      <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                        <Icon className="w-4 h-4" />
-                        {field.placeholder}
-                        {field.required && <span className="text-red-500">*</span>}
-                      </label>
-                      {field.type === "textarea" ? (
-                        <textarea
-                          name={field.name}
-                          placeholder={field.placeholder}
-                          value={formData[field.name]}
-                          onChange={handleChange}
-                          rows={3}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors resize-none"
-                        />
-                      ) : (
-                        <input
-                          type={field.type}
-                          name={field.name}
-                          placeholder={field.placeholder}
-                          value={formData[field.name]}
-                          onChange={handleChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
-                        />
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+              <input name="name" placeholder="Full Name" value={formData.name} onChange={handlePersonalChange} className="w-full border px-4 py-2 rounded" />
+              <input name="jobTitle" placeholder="Job Title" value={formData.jobTitle} onChange={handlePersonalChange} className="w-full border px-4 py-2 rounded" />
+              <input name="email" placeholder="Email" value={formData.email} onChange={handlePersonalChange} className="w-full border px-4 py-2 rounded" />
+              <input name="phone" placeholder="Phone" value={formData.phone} onChange={handlePersonalChange} className="w-full border px-4 py-2 rounded" />
+              <input name="location" placeholder="Location" value={formData.location} onChange={handlePersonalChange} className="w-full border px-4 py-2 rounded" />
+              <input name="website" placeholder="Website/LinkedIn" value={formData.website} onChange={handlePersonalChange} className="w-full border px-4 py-2 rounded" />
+              <textarea name="summary" placeholder="Professional Summary" value={formData.summary} onChange={handlePersonalChange} className="w-full border px-4 py-2 rounded" />
             </div>
 
-            {/* Generate Button */}
+            {/* Education Section */}
+            <div className="bg-white rounded-xl shadow-lg p-6 space-y-4">
+              <h2 className="text-xl font-bold flex items-center gap-2"><GraduationCap className="w-5 h-5" /> Education</h2>
+              {formData.education.map((edu, idx) => (
+                <div key={idx} className="grid grid-cols-2 gap-2 border p-2 rounded">
+                  <input placeholder="Degree" value={edu.degree} onChange={(e) => handleArrayChange("education", idx, "degree", e.target.value)} className="border px-2 py-1 rounded" />
+                  <input placeholder="University" value={edu.university} onChange={(e) => handleArrayChange("education", idx, "university", e.target.value)} className="border px-2 py-1 rounded" />
+                  <input placeholder="Location" value={edu.location} onChange={(e) => handleArrayChange("education", idx, "location", e.target.value)} className="border px-2 py-1 rounded" />
+                  <input placeholder="Start Year" value={edu.startYear} onChange={(e) => handleArrayChange("education", idx, "startYear", e.target.value)} className="border px-2 py-1 rounded" />
+                  <input placeholder="End Year" value={edu.endYear} onChange={(e) => handleArrayChange("education", idx, "endYear", e.target.value)} className="border px-2 py-1 rounded" />
+                  <button type="button" onClick={() => removeArrayItem("education", idx)} className="col-span-2 text-red-500 flex items-center gap-1 text-sm"><Trash className="w-4 h-4" /> Remove</button>
+                </div>
+              ))}
+              <button type="button" onClick={() => addArrayItem("education", { degree: "", university: "", location: "", startYear: "", endYear: "" })} className="flex items-center gap-1 text-blue-600">
+                <Plus className="w-4 h-4" /> Add Education
+              </button>
+            </div>
+
+            {/* Experience Section */}
+            <div className="bg-white rounded-xl shadow-lg p-6 space-y-4">
+              <h2 className="text-xl font-bold flex items-center gap-2"><Briefcase className="w-5 h-5" /> Experience</h2>
+              {formData.experience.map((exp, idx) => (
+                <div key={idx} className="grid grid-cols-2 gap-2 border p-2 rounded">
+                  <input placeholder="Company" value={exp.company} onChange={(e) => handleArrayChange("experience", idx, "company", e.target.value)} className="border px-2 py-1 rounded" />
+                  <input placeholder="Position" value={exp.position} onChange={(e) => handleArrayChange("experience", idx, "position", e.target.value)} className="border px-2 py-1 rounded" />
+                  <input placeholder="Location" value={exp.location} onChange={(e) => handleArrayChange("experience", idx, "location", e.target.value)} className="border px-2 py-1 rounded" />
+                  <input placeholder="Start Date" value={exp.startDate} onChange={(e) => handleArrayChange("experience", idx, "startDate", e.target.value)} className="border px-2 py-1 rounded" />
+                  <input placeholder="End Date" value={exp.endDate} onChange={(e) => handleArrayChange("experience", idx, "endDate", e.target.value)} className="border px-2 py-1 rounded" />
+                  <textarea placeholder="Achievements / Responsibilities" value={exp.details} onChange={(e) => handleArrayChange("experience", idx, "details", e.target.value)} className="col-span-2 border px-2 py-1 rounded" />
+                  <button type="button" onClick={() => removeArrayItem("experience", idx)} className="col-span-2 text-red-500 flex items-center gap-1 text-sm"><Trash className="w-4 h-4" /> Remove</button>
+                </div>
+              ))}
+              <button type="button" onClick={() => addArrayItem("experience", { company: "", position: "", location: "", startDate: "", endDate: "", details: "" })} className="flex items-center gap-1 text-blue-600">
+                <Plus className="w-4 h-4" /> Add Experience
+              </button>
+            </div>
+
+            {/* Skills Section */}
+            <div className="bg-white rounded-xl shadow-lg p-6 space-y-4">
+              <h2 className="text-xl font-bold flex items-center gap-2"><Code className="w-5 h-5" /> Skills</h2>
+              {formData.skills.map((skill, idx) => (
+                <div key={idx} className="flex gap-2 border p-2 rounded">
+                  <input placeholder="Skill" value={skill.name} onChange={(e) => handleArrayChange("skills", idx, "name", e.target.value)} className="flex-1 border px-2 py-1 rounded" />
+                  <button type="button" onClick={() => removeArrayItem("skills", idx)} className="text-red-500 flex items-center gap-1 text-sm"><Trash className="w-4 h-4" /> Remove</button>
+                </div>
+              ))}
+              <button type="button" onClick={() => addArrayItem("skills", { name: "" })} className="flex items-center gap-1 text-blue-600">
+                <Plus className="w-4 h-4" /> Add Skill
+              </button>
+            </div>
+
+            {/* Achievements Section */}
+            <div className="bg-white rounded-xl shadow-lg p-6 space-y-4">
+              <h2 className="text-xl font-bold flex items-center gap-2"><Award className="w-5 h-5" /> Achievements</h2>
+              {formData.achievements.map((ach, idx) => (
+                <div key={idx} className="flex gap-2 border p-2 rounded">
+                  <input placeholder="Achievement" value={ach.title} onChange={(e) => handleArrayChange("achievements", idx, "title", e.target.value)} className="flex-1 border px-2 py-1 rounded" />
+                  <button type="button" onClick={() => removeArrayItem("achievements", idx)} className="text-red-500 flex items-center gap-1 text-sm"><Trash className="w-4 h-4" /> Remove</button>
+                </div>
+              ))}
+              <button type="button" onClick={() => addArrayItem("achievements", { title: "" })} className="flex items-center gap-1 text-blue-600">
+                <Plus className="w-4 h-4" /> Add Achievement
+              </button>
+            </div>
+
+            {/* Generate Resume Button */}
             <div className="bg-white rounded-xl shadow-lg p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold">3</span>
-                Generate Resume
-              </h3>
               <button
                 onClick={handleGenerateResume}
-                disabled={!selectedTemplate || !isFormValid()}
-                className={`w-full py-4 px-6 rounded-lg font-semibold text-white transition-all duration-200 flex items-center justify-center gap-2 ${
-                  selectedTemplate && isFormValid()
-                    ? "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-                    : "bg-gray-400 cursor-not-allowed"
+                disabled={!isFormValid()}
+                className={`w-full py-4 px-6 rounded-lg font-semibold text-white ${
+                  isFormValid() ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-400 cursor-not-allowed"
                 }`}
               >
-                <Download className="w-5 h-5" />
-                Generate Resume
+                <Download className="w-5 h-5 inline-block mr-2" /> Generate Resume
               </button>
-              <p className="text-xs text-gray-500 mt-2 text-center">
-                Preview and download your professional resume
-              </p>
             </div>
           </div>
         </div>
