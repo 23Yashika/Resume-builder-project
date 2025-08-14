@@ -15,6 +15,8 @@ import MobileATSScore from "../components/MobileATSScore";
 import Resume from "../components/Resume";
 
 const ResumePreviewPage = () => {
+  const [atsScore, setAtsScore] = useState(null);
+  const [atsAnalysis, setAtsAnalysis] = useState([]);
   const [zoomLevel, setZoomLevel] = useState(100);
   const [optimizedFormData, setOptimizedFormData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -37,48 +39,97 @@ const ResumePreviewPage = () => {
       try {
         setLoading(true);
 
-        const apiKey = process.env.REACT_APP_GEMINI_API_KEY; // Store in .env
+        const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+        if (!apiKey) throw new Error("Missing VITE_GEMINI_API_KEY in .env");
+
+        //         const prompt = `
+        // You are an expert in resume writing and ATS optimization.
+
+        // TASKS:
+        // 1. Take the following resume JSON and optimize it to maximize ATS scoring for a ${formData.targetJob || "target job"}.
+        // 2. Ensure the result follows this order: Contact Info → Professional Summary → Skills → Work Experience → Education → Certifications → Additional Info.
+        // 3. Provide an ATS score (0-100) and detailed category-wise analysis.
+
+        // Return ONLY JSON in this structure:
+        // {
+        //   "optimizedFormData": {...},
+        //   "atsScore": number,
+        //   "atsAnalysis": [
+        //     { "category": "string", "score": number, "status": "excellent|good|needs improvement", "feedback": "string" }
+        //   ]
+        // }
+
+        // Resume Data:
+        // ${JSON.stringify(formData)}
+        // `;
+
         const prompt = `
-       You are an expert in resume writing and ATS (Applicant Tracking System) optimization. I will provide you with my resume data in JSON format. Your task is to:
+You are an expert in resume optimization for Applicant Tracking Systems (ATS) with 15+ years of experience.
 
-      1.Parse the JSON into a well-structured, professional resume.
+### TASK:
+Analyze the given resume JSON **strictly** for ATS readiness for a ${
+          formData.targetJob || "target job"
+        }. Return both an **optimized resume** and a **strict scoring breakdown**.
 
-      2.Rewrite the content to maximize ATS scoring for [TARGET JOB TITLE or FIELD] by integrating relevant industry keywords naturally.
+---
 
-      3.Strengthen bullet points with measurable achievements, active verbs, and quantified results.
+### SCORING RULES (0–100 scale):
+- **Keyword Relevance (30%)**: Match with job-specific hard skills, soft skills, tools, and certifications from standard job descriptions.
+- **Section Structure (20%)**: Follow exactly: Contact Info → Professional Summary → Skills → Work Experience → Education → Certifications → Additional Info.
+- **Clarity & Conciseness (15%)**: Penalize redundancy, vague descriptions, and overly long sentences.
+- **Formatting for ATS (15%)**: Penalize use of images, columns, unusual fonts, tables, or complex layouts that may confuse ATS parsers.
+- **Quantifiable Achievements (10%)**: Prefer bullet points with metrics (% improvements, revenue impact, etc.).
+- **Grammar & Spelling (10%)**: Strictly penalize any grammar or spelling mistakes.
 
-      4.Ensure the resume is ATS-friendly — avoid tables, images, special symbols, or unusual fonts.
+---
 
-      5.Maintain a clear section order: Contact Info → Professional Summary → Skills → Work Experience → Education → Certifications → Additional Info.
+### INSTRUCTIONS:
+1. Optimize the resume for the target job while preserving truthfulness.
+2. Provide **strict** ATS scoring — avoid inflating the score. If major issues exist, score should be <60.
+3. Return ONLY in this JSON format:
 
-      Output in plain text or clean Markdown, ready for submission to ATS systems.
-        
-        Resume Data:
-        ${JSON.stringify(formData)}
-        `;
+{
+  "optimizedFormData": {...}, 
+  "atsScore": number, 
+  "atsAnalysis": [
+    { "category": "string", "score": number, "status": "excellent|good|needs improvement", "feedback": "string" }
+  ]
+}
+
+Resume Data:
+${JSON.stringify(formData)}
+`;
 
         const response = await fetch(
-          "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" +
-            apiKey,
+          `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
           {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               contents: [{ parts: [{ text: prompt }] }],
             }),
           }
         );
 
+        if (!response.ok) {
+          const errText = await response.text();
+          console.error("Gemini API Error Response:", errText);
+          throw new Error(`API Error: ${response.status}`);
+        }
+
         const data = await response.json();
         const aiText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-        const cleanedJson = JSON.parse(aiText);
 
-        setOptimizedFormData(cleanedJson);
+        // Clean JSON if wrapped in markdown code fences
+        const cleanedText = aiText.replace(/```json|```/g, "").trim();
+
+        const parsed = JSON.parse(cleanedText);
+
+        setOptimizedFormData(parsed.optimizedFormData);
+        setAtsScore(parsed.atsScore);
+        setAtsAnalysis(parsed.atsAnalysis);
       } catch (error) {
         console.error("Gemini optimization failed:", error);
-        // Fallback to original data
         setOptimizedFormData(formData);
       } finally {
         setLoading(false);
@@ -175,7 +226,9 @@ const ResumePreviewPage = () => {
         <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
           <Star size={18} /> ATS Score
         </h2>
-        <MobileATSScore />
+        {/* Mobile + Desktop ATS Score */}
+        <MobileATSScore atsScore={atsScore} atsAnalysis={atsAnalysis} />
+
         <hr className="my-4" />
         <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
           <FileText size={18} /> Resume Tips
