@@ -4,7 +4,7 @@ import { Route, Routes } from "react-router-dom";
 import ChangePassword from "../pages/ChangePassword";
 import Login from "../pages/Login";
 import HomePage from "../pages/HomePage";
-import Resume from "../pages/Resume";
+import Resume from "../components/Resume";
 import ResumeTemplatePage from "../pages/ResumeTemplatePage";
 import ResumePreviewPage from "../pages/ResumePreviewPage";
 
