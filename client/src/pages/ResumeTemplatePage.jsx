@@ -1,8 +1,5 @@
 
 
-
-
-
 import React, { useState, useEffect } from "react";
 import {
   FileText,
@@ -135,41 +132,48 @@ const ResumeTemplatePage = () => {
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Template Selection */}
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-              <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold">1</span>
-              Choose Your Template
-            </h2>
-            {templates.map((template) => (
-              <div
-                key={template.id}
-                onClick={() => setSelectedTemplate(template.id)}
-                className={`relative cursor-pointer rounded-lg border-2 mb-4 ${
-                  selectedTemplate === template.id
-                    ? "border-blue-500 ring-4 ring-blue-100"
-                    : "border-gray-200 hover:border-gray-300"
-                }`}
-              >
-                <div className="flex items-center p-4">
-                  <div className={`w-16 h-20 rounded-lg bg-gradient-to-br ${template.color} flex items-center justify-center`}>
-                    <FileText className="w-8 h-8 text-white" />
-                  </div>
-                  <div className="ml-4 flex-1">
-                    <h3 className="font-semibold flex items-center gap-2">
-                      {template.name}
-                      {selectedTemplate === template.id && <Check className="w-4 h-4 text-blue-500" />}
-                    </h3>
-                    <p className="text-sm text-gray-600 mt-1">{template.preview}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-            {selectedTemplate && (
-              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                ✓ {getSelectedTemplate()?.name} template selected
-              </div>
+     {/* Template Selection */}
+<div className="bg-white rounded-xl shadow-lg p-6">
+  <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+    <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold">1</span>
+    Choose Your Template
+  </h2>
+  {templates.map((template) => (
+    <div
+      key={template.id}
+      onClick={() => setSelectedTemplate(template.id)}
+      className={`relative cursor-pointer rounded-lg border-2 mb-4 overflow-hidden ${
+        selectedTemplate === template.id
+          ? "border-blue-500 ring-4 ring-blue-100"
+          : "border-gray-200 hover:border-gray-300"
+      }`}
+    >
+      <div className="flex items-center p-4 gap-4">
+        {/* Template Image */}
+        <img
+          src={template.image}
+          alt={`${template.name} preview`}
+          className="w-16 h-20 object-cover rounded-lg border"
+        />
+        <div className="flex-1">
+          <h3 className="font-semibold flex items-center gap-2">
+            {template.name}
+            {selectedTemplate === template.id && (
+              <Check className="w-4 h-4 text-blue-500" />
             )}
-          </div>
+          </h3>
+          <p className="text-sm text-gray-600 mt-1">{template.preview}</p>
+        </div>
+      </div>
+    </div>
+  ))}
+  {selectedTemplate && (
+    <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+      ✓ {getSelectedTemplate()?.name} template selected
+    </div>
+  )}
+</div>
+
 
           {/* Form */}
           <div className="space-y-6">
