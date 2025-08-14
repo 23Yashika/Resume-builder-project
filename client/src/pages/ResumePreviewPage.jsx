@@ -1,10 +1,7 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Download,
   Eye,
-  Phone,
-  Mail,
-  MapPin,
   Edit,
   Star,
   FileText,
@@ -19,6 +16,8 @@ import Resume from "../components/Resume";
 
 const ResumePreviewPage = () => {
   const [zoomLevel, setZoomLevel] = useState(100);
+  const [optimizedFormData, setOptimizedFormData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const resumeRef = useRef(null);
 
   const location = useLocation();
@@ -26,10 +25,68 @@ const ResumePreviewPage = () => {
 
   const { formData, selectedTemplate } = location.state || {};
 
+  // Redirect if no formData
   if (!formData) {
-    navigate("/"); // Redirect if opened directly
+    navigate("/");
     return null;
   }
+
+  // Optimise the resume content with Gemini before rendering
+  useEffect(() => {
+    const optimiseWithGemini = async () => {
+      try {
+        setLoading(true);
+
+        const apiKey = process.env.REACT_APP_GEMINI_API_KEY; // Store in .env
+        const prompt = `
+       You are an expert in resume writing and ATS (Applicant Tracking System) optimization. I will provide you with my resume data in JSON format. Your task is to:
+
+      1.Parse the JSON into a well-structured, professional resume.
+
+      2.Rewrite the content to maximize ATS scoring for [TARGET JOB TITLE or FIELD] by integrating relevant industry keywords naturally.
+
+      3.Strengthen bullet points with measurable achievements, active verbs, and quantified results.
+
+      4.Ensure the resume is ATS-friendly — avoid tables, images, special symbols, or unusual fonts.
+
+      5.Maintain a clear section order: Contact Info → Professional Summary → Skills → Work Experience → Education → Certifications → Additional Info.
+
+      Output in plain text or clean Markdown, ready for submission to ATS systems.
+        
+        Resume Data:
+        ${JSON.stringify(formData)}
+        `;
+
+        const response = await fetch(
+          "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" +
+            apiKey,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }],
+            }),
+          }
+        );
+
+        const data = await response.json();
+        const aiText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+        const cleanedJson = JSON.parse(aiText);
+
+        setOptimizedFormData(cleanedJson);
+      } catch (error) {
+        console.error("Gemini optimization failed:", error);
+        // Fallback to original data
+        setOptimizedFormData(formData);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    optimiseWithGemini();
+  }, [formData]);
 
   const handleDownloadPDF = () => {
     console.log("Downloading resume...");
@@ -39,17 +96,9 @@ const ResumePreviewPage = () => {
     navigate("/resume-template", { state: { formData, selectedTemplate } });
   };
 
-  const handleZoomIn = () => {
-    setZoomLevel((prev) => Math.min(prev + 10, 150));
-  };
-
-  const handleZoomOut = () => {
-    setZoomLevel((prev) => Math.max(prev - 10, 50));
-  };
-
-  const handleResetZoom = () => {
-    setZoomLevel(100);
-  };
+  const handleZoomIn = () => setZoomLevel((prev) => Math.min(prev + 10, 150));
+  const handleZoomOut = () => setZoomLevel((prev) => Math.max(prev - 10, 50));
+  const handleResetZoom = () => setZoomLevel(100);
 
   return (
     <div className="flex flex-col lg:flex-row h-screen bg-gray-100">
@@ -101,9 +150,23 @@ const ResumePreviewPage = () => {
           className="flex-1 bg-white shadow-lg rounded-lg overflow-auto flex justify-center items-start"
           ref={resumeRef}
         >
-          <div style={{ transform: `scale(${zoomLevel / 100})`, transformOrigin: "top center" }}>
-            <Resume formData={formData} selectedTemplate={selectedTemplate} />
-          </div>
+          {loading ? (
+            <div className="p-6 text-gray-500">
+              Optimizing resume content...
+            </div>
+          ) : (
+            <div
+              style={{
+                transform: `scale(${zoomLevel / 100})`,
+                transformOrigin: "top center",
+              }}
+            >
+              <Resume
+                formData={optimizedFormData}
+                selectedTemplate={selectedTemplate}
+              />
+            </div>
+          )}
         </div>
       </div>
 
@@ -137,61 +200,3 @@ const ResumePreviewPage = () => {
 };
 
 export default ResumePreviewPage;
-
-
-
-
-
-
-// import React from "react";
-// import { useLocation } from "react-router-dom";
-
-// const ResumePreviewPage = () => {
-//   const location = useLocation();
-//   const { formData, atsScore, selectedTemplate } = location.state || {};
-
-//   if (!formData) {
-//     return <div className="p-6">No data provided. Please go back and fill out the form.</div>;
-//   }
-
-//   return (
-//     <div className="p-6 bg-gray-50 min-h-screen">
-//       <div className="bg-white p-4 rounded shadow-md max-w-4xl mx-auto">
-//         <h1 className="text-2xl font-bold mb-2">{formData.name}</h1>
-//         <p>{formData.email} | {formData.phone} | {formData.address}</p>
-//         <p>{formData.website}</p>
-
-//         <div className="bg-green-100 text-green-800 px-3 py-1 rounded inline-block mt-4">
-//           ATS Score: <strong>{atsScore}</strong>/100
-//         </div>
-
-//         <h2 className="mt-6 font-bold text-xl">Summary</h2>
-//         <p>{formData.summary}</p>
-
-//         <h2 className="mt-6 font-bold text-xl">Education</h2>
-//         <ul>
-//           {formData.education.map((edu, index) => (
-//             <li key={index}>{edu.degree} - {edu.institution} ({edu.year})</li>
-//           ))}
-//         </ul>
-
-//         <h2 className="mt-6 font-bold text-xl">Experience</h2>
-//         <ul>
-//           {formData.experience.map((exp, index) => (
-//             <li key={index}>
-//               <strong>{exp.title}</strong> at {exp.company} ({exp.year}) - {exp.description}
-//             </li>
-//           ))}
-//         </ul>
-
-//         <h2 className="mt-6 font-bold text-xl">Skills</h2>
-//         <p>{formData.skills.join(", ")}</p>
-
-//         <h2 className="mt-6 font-bold text-xl">Awards</h2>
-//         <p>{formData.awards.join(", ")}</p>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default ResumePreviewPage;
