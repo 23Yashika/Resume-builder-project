@@ -15,14 +15,7 @@ const Resume = () => {
 
   return (
     <div className="max-w-4xl mx-auto bg-white text-black p-8 border border-gray-300 my-6 rounded-lg shadow-lg">
-      {/* Back Button */}
-      <button
-        onClick={() => navigate(-1)}
-        className="flex items-center text-blue-600 mb-4"
-      >
-        <ArrowLeft className="w-4 h-4 mr-1" /> Back
-      </button>
-
+     
       {/* Header */}
       <header className="border-b border-gray-400 pb-4 mb-6">
         <h1 className="text-3xl font-bold">{formData.name}</h1>
